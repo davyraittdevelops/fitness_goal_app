@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
       String monthStr =
           "${month.month.toString().padLeft(2, '0')}-${month.year}";
       Uri uri = Uri.parse(
-          'https://pcfimc69k0.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=$monthStr');
+          'https://1inkf1xm8i.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=$monthStr');
       final response = await http.get(uri, headers: {'x-api-key': apiKey});
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Uri uri = Uri.parse(
-        'https://pcfimc69k0.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=currentyear');
+        'https://1inkf1xm8i.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=currentyear');
     final response = await http.get(uri, headers: {'x-api-key': apiKey});
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -148,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     Uri uri = Uri.parse(
-        'https://pcfimc69k0.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=currentweek');
+        'https://1inkf1xm8i.execute-api.eu-central-1.amazonaws.com/prod/personalgarmindata?range=currentweek');
     final response = await http.get(uri, headers: {'x-api-key': apiKey});
     if (response.statusCode == 200) {
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
