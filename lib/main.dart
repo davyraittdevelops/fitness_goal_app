@@ -74,16 +74,57 @@ class _MyHomePageState extends State<MyHomePage> {
     final prefs = await SharedPreferences.getInstance();
     goalKmWeek = prefs.getDouble('goalKmWeek') ?? 15.0;
     streak = prefs.getInt('streak') ?? 0;
+
+    // Check if a new week has started
+    DateTime now = DateTime.now();
+    DateTime? lastWeekStartDate =
+        DateTime.tryParse(prefs.getString('lastWeekStartDate') ?? '');
+    if (lastWeekStartDate == null || !_isSameWeek(now, lastWeekStartDate)) {
+      // If it's a new week, reset the weekly goal and streak
+      await _resetWeeklyGoalAndStreak(prefs, now);
+    }
+  }
+
+  Future<void> _resetWeeklyGoalAndStreak(
+      SharedPreferences prefs, DateTime now) async {
+    goalKmWeek = 15.0; // Reset to initial goal
+    streak = 0;
+
+    // Save the new week's start date
+    DateTime weekStartDate = _getStartOfWeek(now);
+    await prefs.setString('lastWeekStartDate', weekStartDate.toIso8601String());
+
+    // Reset the weekly increase flag
+    await prefs.setBool('goalIncreasedThisWeek', false);
+
+    // Save the reset goal and streak
+    await prefs.setDouble('goalKmWeek', goalKmWeek);
+    await prefs.setInt('streak', streak);
+  }
+
+  bool _isSameWeek(DateTime date1, DateTime date2) {
+    DateTime weekStart1 = _getStartOfWeek(date1);
+    DateTime weekStart2 = _getStartOfWeek(date2);
+    return weekStart1 == weekStart2;
+  }
+
+  DateTime _getStartOfWeek(DateTime date) {
+    int daysToSubtract = date.weekday - DateTime.monday;
+    return DateTime(date.year, date.month, date.day - daysToSubtract);
   }
 
   Future<void> _updateGoalAndStreak(double totalKmThisWeek) async {
     final prefs = await SharedPreferences.getInstance();
-    if (totalKmThisWeek >= goalKmWeek) {
+
+    // Check if the goal has already been increased this week
+    bool goalIncreasedThisWeek =
+        prefs.getBool('goalIncreasedThisWeek') ?? false;
+
+    if (totalKmThisWeek >= goalKmWeek && !goalIncreasedThisWeek) {
       streak++;
-      goalKmWeek *= 1.1; // Increase goal by 10%
-    } else {
-      streak = 0;
-      goalKmWeek = 15.0; // Reset to initial goal
+      goalKmWeek += 0.1; // Increase goal by 100 meters
+      // Set the flag to true to prevent further increases this week
+      await prefs.setBool('goalIncreasedThisWeek', true);
     }
     await prefs.setDouble('goalKmWeek', goalKmWeek);
     await prefs.setInt('streak', streak);
